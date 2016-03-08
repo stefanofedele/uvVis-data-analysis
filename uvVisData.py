@@ -24,7 +24,8 @@ def integTime(file_k): #find integral time
     return float( file_k[index1:index2].replace('_', '.') )
 #functions <------------------------------------------------------------------------------------
 
-path = r"C:\Users\fedel_000\Documents\Measurements\stefano\Reflectance_12_19_angle_resolved"
+path = r"C:\Users\fedel_000\Documents\Measurements\stefano\Reflectance_10_21_angle_resolved"
+#path = r"C:\Users\fedel_000\Documents\Measurements\stefano\Reflectance_12_19_angle_resolved"
 s = '\\' # '\\' for windows and '/' for linux
 folders = os.listdir(path)
 List = {} # dictionary of files by polarization
@@ -49,11 +50,11 @@ for angles in folders:
     pol = ['noPol', '90Pol', '00Pol'] # different types of polarizations
     
     #for pol_k in pol:
-    for pol_k in [ pol[2] ]: # it selects just one type of polarization
+    for pol_k in [ pol[1] ]: # it selects just one type of polarization
         List[ pol_k ] = sel( pol_k , listFiles) 
         ListBG[ pol_k ] = sel('background', List[ pol_k ])[0] # dictionary of backgrounds by polarizations            
         ListSG[ pol_k ] = sel( 'signal' , List[ pol_k ]) # dictionary of signals by polarization
-        ListSG[ pol_k ] = sel( 'AuNR_angle' , ListSG[ pol_k ] ) # select spectra with ONLY Gold Nanorods
+        ListSG[ pol_k ] = sel( 'AuNR_TMPyP_HCl_5_0ml_angle' , ListSG[ pol_k ] ) # select spectra with ONLY Gold Nanorods
         
         #bg = pd.read_csv(pathFiles + s + ListBG[ pol[0] ], sep=',', header= None)[1].astype(float)/integTime( ListBG[ pol_k ] )        
         bg = pd.read_csv(pathFiles + s + ListBG[ pol_k ], sep=',', header= None)[1].astype(float)/integTime( ListBG[ pol_k ] )
@@ -62,10 +63,16 @@ for angles in folders:
             Path = pathFiles + s + fileName
             signal = pd.read_csv(Path, sep=',', header= None)[1].astype(float)/integTime(fileName)
             reflectance[ fileName ] = signal / bg
+            
             line, = ax.plot(wavelength, reflectance[ fileName ], label = fileName[:-4])
             ax.legend(handles=[line])
             plt.pause(Time)
-    
+            
     j = j + 1
 
+reflectance['wavelegth (nm)'] = list(wavelength)
 
+AllData = pd.DataFrame(reflectance)
+#AllData.set_index('wavelegth (nm)')
+#AllData.index.name = None
+#AllData = pd.DataFrame(reflectance, index = list(wavelength))
